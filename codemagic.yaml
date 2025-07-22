@@ -1,0 +1,38 @@
+# codemagic.yaml
+workflows:
+  ios-app-store-build:
+    name: iOS App Store Build
+    environment:
+      xcode: latest # 사용할 Xcode 버전
+      cocoapods: default
+      groups:
+        - codemagic # 필수 그룹
+        # App Store Connect API 키 정보를 여기에 추가합니다.
+        # Codemagic 웹사이트의 환경변수 설정에서 추가해야 합니다.
+        - app_store_credentials
+      vars:
+        BUNDLE_ID: "com.ver1.gdn0" # 여기에 본인의 번들 ID를 입력하세요.
+        XCODE_SCHEME: "gdn0"      # 여기에 본인의 Xcode 스킴 이름을 입력하세요.
+        XCODE_PROJECT: "gdn0.xcodeproj" # 여기에 본인의 Xcode 프로젝트 파일 이름을 입력하세요.
+    scripts:
+      - name: Set up keychain
+        script: | 
+          keychain initialize
+      - name: Fetch signing files
+        script: | 
+          app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create
+      - name: Set up code signing settings
+        script: | 
+          xcode-project use-profiles
+      - name: Build ipa for App Store
+        script: | 
+          xcode-project build-ipa --project "$XCODE_PROJECT" --scheme "$XCODE_SCHEME"
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
+    publishing:
+      app_store_connect:
+        api_key: $APP_STORE_CONNECT_API_KEY      # Codemagic 환경변수
+        key_id: $APP_STORE_CONNECT_KEY_ID        # Codemagic 환경변수
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID  # Codemagic 환경변수
