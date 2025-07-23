@@ -6,7 +6,7 @@ workflows:
       xcode: latest # 사용할 Xcode 버전
       cocoapods: default
       groups:
-        - codemagic # 필수 그룹
+       
         # App Store Connect API 키 정보를 여기에 추가합니다.
         # Codemagic 웹사이트의 환경변수 설정에서 추가해야 합니다.
         - app_store_credentials
