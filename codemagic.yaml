@@ -20,7 +20,7 @@ workflows:
           keychain add-certificates --certificate /tmp/certificate.p12 --certificate-password $CERTIFICATE_PASSWORD
       - name: Set up code signing settings
         script: | 
-          xcode-project use-profiles
+           xcode-project use-profiles --project "$XCODE_PROJECT" --team-id "6FD7Y7A32X" --bundle-id "$BUNDLE_ID"
       - name: Build ipa for App Store
         script: | 
           xcode-project build-ipa --project "$XCODE_PROJECT" --scheme "$XCODE_SCHEME"
