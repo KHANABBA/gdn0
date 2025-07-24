@@ -10,19 +10,20 @@ workflows:
         BUNDLE_ID: "com.ver1.gdn0"
         XCODE_SCHEME: "gdn0"
         XCODE_PROJECT: "gdn0.xcodeproj"
-    scripts:
-      - name: Set up keychain
-        script: | 
-          keychain initialize
-      - name: Fetch signing files
-        script: | 
-          app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create
-      - name: Set up code signing settings
-        script: | 
-          xcode-project use-profiles
-      - name: Build ipa for App Store
-        script: | 
-          xcode-project build-ipa --project "$XCODE_PROJECT" --scheme "$XCODE_SCHEME"
+      scripts:
+        - name: Set up keychain
+          script: | 
+            keychain initialize
+        - name: Install certificate
+          script: | 
+            echo $CM_CERTIFICATE | base64 --decode > /tmp/certificate.p12
+            keychain add-certificates --certificate /tmp/certificate.p12 --certificate-password $CERTIFICATE_PASSWORD
+        - name: Set up code signing settings
+          script: | 
+            xcode-project use-profiles
+        - name: Build ipa for App Store
+          script: | 
+            xcode-project build-ipa --project "$XCODE_PROJECT" --scheme "$XCODE_SCHEME"
     artifacts:
       - build/ios/ipa/*.ipa
       - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
